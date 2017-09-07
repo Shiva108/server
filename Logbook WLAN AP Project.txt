@@ -1,0 +1,29 @@
+1) Connected AP terminal cable (USB to LAN interface )
+2) Connected with hyperterminal to configure and IP address. THis is needed to access web gui (HTTP). IP scheme: 10.0.0.1/24 and subnet 255.255.255.0 . This is nice cause it will not conflict with virtual box.
+3) Configuring trough interface:
+		en (enable) (enterpassword: cisco)
+		show run (for info)
+		config t (global mode, shouldnt work at this point) (global mode is config mode)
+		hostname CiscoAP (sets AP name) (doesnt matter)
+		int bv1 (actual device interface ip)
+		ip address 192.168.0.1 255.255.255.0 (sets Ip address according to scheme)
+	Now it is possible to access web interface (http).
+		show ip int brief (for ip setup info)
+4) Express security and filledi n SSID and ticket off broadcast SSID in beacon (sends out beacon frames).
+Then network interfaces > Settings > Enable radio (on both radio bands)
+5) AP is broadcasting on channel 3 and not other APs are conflicting (see screenshot of inSSIDer)
+Still in radio just for trying it out AP was changed to channel 11. Link score went from 25 to 78.
+6) Configured hosts for same IP ranged as AP and set AP as default gateway.
+(See screenshot with ping as proof)
+7) Read of MAC addresses of clients in network map.
+Then go to services -> Filters > Mac address filters > Add the two addresses of the clients that should be allowed. Default action should be set to block all. Then services and enable filter saved. Filter index was set to 700 as it was the first one.
+Ping works between clients, see screenshot.
+9-12) Services > Filters > Mac address filters > Gave filter index 701 > Added mac addresses > Set to fwd > Set(default action lock all) > Apply filters.
+Apply fitlers > Both radios set filter to use mac (both in and out connections)
+13) Security > Encryption manager > Set WEP encryption mandatory > Set encryption to key > Key size 40 bit > Apply all
+14) Pinged worked, see picture
+15-16) Security > Encryption Manager > Global Properties > WPA Group Key Update > Enable Group Key Update On Membership *
+17) Express Security > Set SSID (SKYnet01) > Broadcast SSID disabled > Static WEP 1234567890 
+18) Change to dynamic IP (before static IP) > In easy setup.
+19) See picture.
+21) Yes cause they get assigned from the AP.

@@ -1,0 +1,158 @@
+Linux server notes
+
+Desktop
+https://help.ubuntu.com/community/ServerGUI
+sudo apt-get install xauth
+sudo apt-get install xorg
+sudo apt-get install openbox
+sudo apt-get install ubuntu-desktop
+sudo apt-get install gnome-desktop-environment
+
+General
+ifconfig (ipconfig)
+sudo ip addr
+
+Update:
+sudo apt-get update
+sudo apt-get upgrade
+
+Network Manager:
+sudo apt-get install network-manager
+sudo start network-manager
+
+DNS server:
+https://help.ubuntu.com/lts/serverguide/dns-configuration.html
+sudo apt-get install bind9 bind9-doc
+cd etc/bind
+sudo leafpad named.conf.options
+	forwarders {
+	 	192.168.81.10;
+		8.8.8.8;
+		
+	 };
+(note: google and gateway)
+sudo leafpad named.conf.local
+	Add:
+		#FORWARD LOOKUP ZONE (Holds A records, maps hostnames to IPs)
+	zone "ubuntu.local"
+	{
+		type master;
+		file "/etc/bind/zones/ubuntu.local.db";
+
+	};
+	#REVERSE LOOKUP ZONE - Holds PTR records, maps IP address to a hostname
+	zone "0.168.192.in-addr.arpa"
+	{
+		type master;
+		file "rev.0.168.192.in-addr.arpa";
+	};
+	
+Still in /etc/bind
+sudo mkdir zones
+cd zones
+cat /etc/bind/named.conf.local
+leafpad ubuntu.local.db
+	$TTL 3d
+	@ IN SOA dc.ubuntu.local admin.dc.ubuntu.local. (
+	2015112601;
+	28800;
+	3600;
+	604800;
+	38400;
+	);
+
+	admin.dc.ubuntu.local. 	IN NS 	admin.dc.ubuntu.local
+	Ubuntu			IN A	192.168.81.10
+	WinXP			IN A	192.168.81.11
+	Fileserver		IN A	192.168.81.2
+	Desktop			in A	192.168.81.129
+
+
+sudo leafpad rev.0.168.192.in-addr.arpa
+		$TTL 3d
+	@ IN SOA dc.ubuntu.local admin.dc.ubuntu.local.
+	(
+	2015112601;
+	28800;
+	604800;
+	604800
+	86400;
+
+	);
+
+			IN	NS 	dc.ubuntu.local.
+	100		IN	PTR 	admin.dc.Ubuntu.local.
+	110		IN 	PTR 	Fileserver.ubuntu.local.
+	115		IN 	PTR	WinXP.ubuntu.local.
+	120		IN	PTR	Desktop.ubuntu.local.
+	1		IN	PTR	gateway.ubuntu.local.
+sudo leafpad resolv.conf
+	search ubuntu.local.
+	nameserver 192.168.81.10
+sudo /etc/init.d/bind9 restart
+
+
+
+
+DHCP server:
+https://help.ubuntu.com/community/isc-dhcp-server
+sudo apt-get install isc-dhcp-server
+nano -w /etc/dhcp/dhcpd.conf
+sudo service isc-dhcp-server restart
+sudo service isc-dhcp-server start
+sudo service isc-dhcp-server stop 
+
+Set static ip:
+On server:
+sudo leafpad /etc/network/interfaces:
+	auto eth0
+	iface eth0 inet static
+
+	address 192.168.81.10
+	netmask 255.255.255.0
+	network 192.168.81.0
+	broadcast 192.168.81.255
+	gateway 192.168.81.1
+	dns-nameservers 192.168.81.10 8.8.8.8
+dns-search ubuntu.local
+sudo leafpad etc/hosts
+	127.0.0.1	localhost
+	192.168.81.10	dc.ubuntu.local
+	# The following lines are desirable for IPv6 capable hosts
+	::1     localhost ip6-localhost ip6-loopback
+	ff02::1 ip6-allnodes
+	ff02::2 ip6-allrouters
+sudo /etc/init.d/networking restart ( restarts network)
+sudo apt-get remove network-manager
+sudo leafpad /etc/hostname
+	dc.ubuntu.local
+sudo apt-get install git build-essential libacl1-dev libattr1-dev libblkid-dev libgnutls-dev libreadline-dev python-dev python-dnspython gdb pkg-config libpopt-dev libldap2-dev dnsutils libbsd-dev attr krb5-user docbook-xsl libcups2-dev libpam0g-dev ntp -y
+
+// adding default gateway: sudo route add default gw 192.168.81.1 eth0
+Client:
+sudo leafpad /etc/resolv.conf
+	nameserver 192.168.81.10
+	search ubuntu.local.
+
+
+
+
+
+
+Openldap
+https://help.ubuntu.com/lts/serverguide/openldap-server.html
+sudo leafpad /etc/hosts
+127.0.1.1	ubuntu.local ubuntu
+sudo ufw status (to see if firewall is up)
+sudo udw app list (to see if LDAP application profile is set up)
+sudo ufw allow "openLDAP LDAP" (updating firewall rules to allow LDAP)
+sudo ufw status (to recheck firewall )
+sudo ldapsearch -Q -LLL -Y EXTERNAL -H ldapi:/// -b cn=config dn (to see  slapd-config DIT via the LDAP protocol.)
+
+
+NIS server:
+https://help.ubuntu.com/community/SettingUpNISHowTo
+
+Samba server:
+https://help.ubuntu.com/community/Samba/SambaServerGuide
+

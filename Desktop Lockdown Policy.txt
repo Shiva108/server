@@ -1,0 +1,69 @@
+Desktop Lockdown Policy
+[Insert RANDOM photo from  net]
+
+
+Problem description
+create a GPO solution where the user accounts in a company don’t have permission to change wallpaper on their computer however the owner of the company and a single IT assistant is exempted. 
+
+Case info
+The owners “user account” reside in an OU called Executives.
+The company consist of following departments: Sales, Operations and Executives. 
+
+Group Policy General
+	Group policy is a Microsoft technology that allows centralized control of user and computer settings. Using group policy enables control over the user experience from a centralized location (in a domain) by customizing the look and feel of the desktop and configuring other settings on the computer. Before group policy, admins had to rely on .ini files and scripts, this often let to chaotic IT environments. Group policy are made by admins on a DC running windows server and then stored in AD database. Subsequently the policy is then downloaded to the (Microsoft windows) client. The client then applies the policy using group group policy client extensions (GPCE) and can be observed by browsing the clients registry. In 2008 R2 there are more than 2300 different settings to be set using GPO and accomplishes a variety of things such as setting up printer connections or for the client or, as in the this assignment, disable the change of desktop background. There is a difference between policies and preferences, despite both being set with GP management editor, policies are forced while preferences are optional for the user.
+
+	Precedence
+		"The GPO with the lowest link order is processed last, and therefore has the highest precedence. Domain—Processing of multiple domain-linked GPOs is in the order specified by the administrator, on the Linked Group Policy Objects tab for the domain in GPMC"
+		(src: Microsoft Technet, https://technet.microsoft.com/en-us/library/cc785665%28v=ws.10%29.aspx)
+	
+	Inheritance 
+		"The GPO link with Link Order of 1 has highest precedence on that container." (in GPM)
+		(src: Microsoft Technet, https://technet.microsoft.com/en-us/library/cc739343%28v=ws.10%29.aspx)
+	
+	 Block Inheritance
+		"The ability to prevent an OU or domain from inheriting GPOs from any of its parent container. Note that Enforced GPO links will always be inherited."
+		(src: Microsoft Technet, https://technet.microsoft.com/en-us/library/cc739343%28v=ws.10%29.aspx)
+
+	Enforcing
+		 "The ability to specify that a GPO should take precedence over any GPOs that are linked to child containers. Enforcing a GPO link works by moving that GPO to the end of the processing order."
+		(src: Microsoft Technet, https://technet.microsoft.com/en-us/library/cc739343%28v=ws.10%29.aspx)
+
+
+Discussion of three GPO solutions
+	- You separate the user accounts into department OU’s and apply different GPO’s to each OU
+		Visio
+		[Insert VISIO 1 and other drawings here]
+		Advantages
+			Easy and super fast to apply.
+		Disadvantages
+			Does not scale well
+			
+
+	- You separate your user accounts into the department OU’s. The department OU’s reside inside an OU called “Company Users”. You apply only one GPO to the OU “Company Users”. Use block inheritance where it is appropriate in order to fulfil the above requirements
+		[INSERT PICTURE 3 HERE WITH VISIO]
+		Advantages
+			Scales better
+			Allows to change GP for all users in one place
+		Disadvantages
+			More complex
+			Requires proper OU setup
+			
+
+	- You are using a Security Filtering solution to exempt the Owner and the IT Assistant from having the Desktop Wall Paper GPO applied to them – It is allowed to use just a simple OU structure with only one OU container where in all the groups and user accounts reside.
+		[INSERT PICTURES HERE]
+		Visio
+		Advantages
+			Allows for more deeper more complex GP
+			Does not require proper OU setup in advance
+		Disadvantages
+			Extra steps
+						
+		
+Conclusion
+	None of the three solutions are the best in any scenario, it depends on what is needed: 
+	#1 Is good in a small company because its easy to manage even without a large IT staff but it does not scale well.
+	#2 Scales better and allows to change GP for all users fast which is good in a scenario with many accounts. The solution is slightly more complex than #1 but still easy to administer.
+	#3 Is good for a highly complex scenario where settings upon other settings are needed. It requires a lot of extra steps and time compared to #1 and #2. This is only best solution if it is impossible to sort out OUs.
+	
+	None is the "best" solution as it depends on scenario however #2 is favorable in many cases, its fast to administer and it scales well.
+	

@@ -1,0 +1,78 @@
+Server report noter:
+
+Windows 2003 servers:
+	Domain Controller, 
+	Web Server, 
+	File Server 
+	server for backup.  
+
+Naming convention:
+	File server: FILE-MEM1-2K3
+	Naming convention must be explained in bullet form 
+	and used for other servers.
+	
+Domain controller:
+	DNS service
+	DHCP service
+	
+File server: 
+	allocate only a 10 GB dynamic allocated hard disk for the operating system. 
+	create a partition with a size of 6 GB - means 4 GB has to be left unformatted.
+	create two equal sized mirror-set of disks
+		one mirror-set of disks to the Sales department 
+		one mirror-set of disks to the Operation department.  
+		Use four disks with a size of 3 GB 
+		OR by using two disks with a size of 6 GB depended of the mirror solution you choose to configure – describe and substantiate. 
+		
+Organisation structure:
+	Sales department
+		Sales Assistants 
+		Sales Managers 
+	Operation department
+		Operation Assistants
+		Operation Managers
+		
+Based on organisation:
+	Define users
+	Define groups
+	Define simple group strategy
+		Assign permissions
+		Provice access to folders
+	create an OU (examples on-line)structure (configured on the DC) reflecting the company’s organization 
+	Make Visio diagram of the OU structure
+	Define folders needed for the users and departments.
+		Allocate a private folder to each user account
+		All folders are deployed on the file server.
+		Before the deployment you have prepare a folder plan done as a Visio diagram. 
+		Elaborate a permission plan (a table) where you configure the need for permissions for every individual user type and department.
+			Don’t forget to consider or to reflect over the need of permission across departments.
+			Substantiate your reflections in the report. 
+
+Backup server:
+	Daily backup during midnight from Monday – Friday
+	
+Web server 
+	Configure configure a very simple web page (HTML document). 
+	On the Web server you have to enable the FTP service. 
+	Configure an Alias (CNAME) resource record on the DNS server. 
+	
+Planning:
+	Definitions 
+	Descriptions 
+	Configurations 
+	Substantiate the reflections the choices are based on. 
+
+Task plan: 
+	Naming convention for OU’s, servers, user accounts, groups, folders etc.
+	Planning OU structure and folder structure
+	IP addresses and address pool related to resources you define – Static contra dynamic  IP addresses 
+	Which services / server roles do you need on the particular servers
+	What do you need of hard disks, disk controllers etc.
+	Permission plan – Create a table
+	Test scenarios – Define how you test your server environment and access to folders
+	Elaboration of a deployment plan
+	Etc. 
+	
+NOTE: A deployment plan is a plan with configurations listed in the order they have to be executed.   
+ And don’t forget to deploy an XP client. Otherwise you will not be able to execute tests. 
+

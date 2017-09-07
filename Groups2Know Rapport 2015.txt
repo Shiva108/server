@@ -1,0 +1,128 @@
+Groups2Know Rapport Autumn 2015
+
+
+
+Introduction
+This report is the documentation of an assignment for server, IT-technology AP-program, second semester on KEA 2015. The work presented herein works as documentation for knowledge obtained in the first two months of second semester server. The assignment has the pedagogical advantage that it forces the student to think and apply theoretical knowledge from the Microsoft certification books know as 70-640 and 70-642 (aka "AD"/"NI"). The report is purely academic as no actually server installation has to be done or simulated in virtual machines. The purpose, of the project, is to work with a – somewhat - realistic scenario, like one a student might meet in the wild but with a difficulty level fitting a second semester student.
+About the case: G2K is a US based company who wants to penetrate the European market, starting with the Nordics and then moving on to Germany. The European branch will be independent, IT wise,  from the US. As this case starts G2K already have operations and EU HQ in Copenhagen, Denmark. A new location in Gothenburg, Sweden, is on the way and the goal is later to expand to Norway. If the Nordic venture is a success Germany is next, giving the company a more central location in the EU.	
+The Copenhagen Office (HQ) has the following departments:
+	Executives
+	Sales office
+	HR office
+	Production unit
+	Operation unit
+	IT office
+The Gothenburg office has the following departments:
+	Mid-level Management
+	Sales office
+	Operation unit
+	Production unit
+	HR office
+	
+It is important to notice that the Swedish office do not have a resident IT crew.
+
+Problem Definition and Scope
+The project have multiple tasks including understanding theoretical information and demonstrating the use, in a purely academic fashion, by documenting it in this report. More than just repetition of textbooks are required. 
+Overall, this breaks down to the following tasks:
+	Design forest, domain, site structure.
+	Define OU structure.
+	Define a group strategy (nesting solution) based on the different group scopes. 
+		Setting up groups for sharing between domains
+	A solution for sharing information between markets / locations
+	
+Hence this report includes design for forest/domain/site structure, server architecture, AD structure, OU structure, group management strategy and nesting solutions - all for Groups2Know case.
+
+The Project
+	A short overview of the elements of an active directory network
+		An active directory (Microsoft Windows server family) network consist of three key containers: A forest, which is a collection of domains; domains, which are containers within a forest that represent administrative and replication boundary; and organizational units (OU's), which are typical departments or groups and are used to structure and managed the network so it reflects the company's business organization. 
+		Domains are normally created for geographical or organizational reasons. The main purpose is to separate administration and/or reduce replication.
+		(src: Ratmir Timashev, http://searchwindowsserver.techtarget.com/tip/Single-forest-vs-multi-forest-Active-Directory-design)
+		[MOVING?:
+		Besides forests, domains and groups active directory (AD) also have the option of sites and according to Microsoft: "Sites.... represents the physical structure, or topology, of your network. Active Directory uses topology information, stored as site and site link objects in the directory, to build the most efficient replication topology. You use Active Directory Sites and Services to define sites and site links. A site is a set of well-connected subnets. Sites differ from domains; sites represent the physical structure of your network, while domains represent the logical structure of your organization."
+		(src: Microsoft Technet, https://technet.microsoft.com/en-us/library/cc782048%28v=ws.10%29.aspx)
+		Why we need sites? Why is forests, domains and groups not enough? Think replication, authentication and AD-enabled services. Whereas many small AD networks can be configured fine without sites they are essential for larger networks. Replication is the replication of active directory and global directory (if active) between domain controllers. Things to consider for replication is balancing network traffic and cost of domain controllers (DC's). As for authentication: When a client logs on to a domain it needs to contact a DC to authenticate and therefore establishing multiple sites ensures that the clients can authenticate against domain controllers nearest to them thereby reducing latency and so removes traffic off WAN connection, which can reduce cost. (src: Microsoft Technet, https://technet.microsoft.com/en-us/library/cc782048%28v=ws.10%29.aspx) ]
+		This was a short summary of the main elements in a AD server network. The following chapters will demonstrate use of the concepts on the Groups2Know (G2K case) using the "famous" top-down approach.
+	Forest
+		As described above a forests is the largest container in a AD network but the fun doesn't stop there, it is possible to have forests inside forests! A a forest can have multiple domains inside as well. The choice then comes down to one forest, with several domains inside or multiple forest, still with the possibility for several domains inside. A single directory (forest) design offers many advantages i.e.. "is easier to administer, provides lower support costs, and offers the best collaboration and messaging environment for the whole company. However, a single forest is the least secure design." (src: Ratmir Timashev, http://searchwindowsserver.techtarget.com/tip/Single-forest-vs-multi-forest-Active-Directory-design) 
+		On the other hand "A multi-forest design is when the entire company's network is separated into several forests. It carries higher administrative and support costs, and complicates collaboration and messaging. However, it provides the highest level of security." (src: Ratmir Timashev, http://searchwindowsserver.techtarget.com/tip/Single-forest-vs-multi-forest-Active-Directory-design) 
+		Why does multi-forest design result in better security? Well according to Ratmir Timashev: "A rogue administrator in one domain can potentially get unauthorized access to resources in all domains in the forest by using the "Domain Trust" vulnerability or manipulating the Global Catalog. So, a single forest with multiple domains means no security boundaries in the directory." (src: Ratmir Timashev, http://searchwindowsserver.techtarget.com/tip/Single-forest-vs-multi-forest-Active-Directory-design)
+		Hence, it seems, the only solution for G2Ks european launch are multiple forests ie. to start with a nordic forest and then add a german forest later. If anyone, like eg. an european excutive would need access to both forests it is possible in AD to create forest aswell as domain trusts. Seperate forests are not needed for norway and sweden as they will only have RODC servers, more about this in the following chapter(s). Furthermore the forest should not be to small as it will be to costly and require to many IT-staff work hours to manage. This is all speculative of course, as the case does not mention G2K revenue, IT-budget, IT-staff size or launch investment. Also it is surprising that G2K will have production both in Denmark and Sweden, it seems like a business manager did a bad decision, Swedish salary is much lower than Danish, but such analysis is out of scope.
+		[Insert forest pictures here]
+	
+	Domain
+		One design solution was - liberately - left out in the last chapter, the single domain forest aka. the dedicated forest root domain. However according to 70-640 "AD" book (p. 619) this is not recommended: "It is no longer recommended to implement a dedicated forest root domain for most enterprises. A single-domain forest is the most common design recommendation. No single design is appropriate for every organization, so you must examine the characteristics of your enterprise against the design criteria presented later in this lesson." So discoraged, by Microsoft, the single domain forest is only mentioned in order to show knowledge of such.
+		[TO BE MOVE?
+		Domain naming:
+			As forests and domain names needs not to follow web domain names, which are named according to marketing and sales needs, a two domain name acquision is recommended: G2KNordic.com and G2KGermany.com. Subsequently these can be broken down to as needed ie. to DK.G2KNordic.com, SE.G2KNordic.com, DK-Sales.G2KNordic.com, Sales.G2KGermany.com and etc. as/if needed.
+		]
+		As a single domain forest was left out because of security reasons, see the beginning of this chapter, only multiple domain forest is left. Since G2K is launching in Denmark first and Copenhagen office will HQ for Europe it makes sense to use the G2KNordic.com domain name within the Nordic forest. The Denmark business location will hold seven departments ie. excutive office, mid-level management, sales, HR, production, operation, IT and eventhough it is stated in the 70-640 "AD" book (p. 620) that "the important point to remember is that you should never create a multiple-domain forest simply to reflect the organizational structure of your business. That structure—the business units, divisions, departments, and offices—will change over time. The logical structure of your directory service should not be dependent solely on organizational characteristics" it deserves consideration aswell. It is also worth to consider that an active directory domain has a single domain space and so multiple domain names requires multiple domains. In this regard things such as cost and risks are important to consider (src. 70-640 "AD" p. 621). These costs are both administration of AD but also cost in hardware as each domain will need two DC's, for backup reasons and in case of outage. 
+		According to Micosoft Technet the four things to consider when planing multiple domains are:
+			Different password requirements between departments or divisions
+			Massive numbers of objects
+			Decentralized network administration
+			More control of replication
+		(src: https://technet.microsoft.com/en-us/library/cc780856%28v=ws.10%29.aspx)
+		The case does not mention anything as for requirements between departments so one can only imagine. But it would probably be prudent to enforce stricter password requirements on the excutive department than e.g production. Neither does the case mention anthing about the number of objects needed for the AD of G2K but as it is an US company launching operations in Nordic and Germany as far as this report is concerned it is a substantional number. This further supports a multiple domain solution. Figure xx shows this solution: 
+		[INSERT DOMAIN DRAWINGS HERE]
+		In the Nordic forest the executive office, management and HR are one domain as they are expected to have data that should be securely seperated from rest of the company. This domain could have been divided further but in order to save cost these three departments share one domain. Further seperation between departments will come later using OU structure and group strategy, as/if needed. IT is placed on a seperated domain for security reasons, this seperates the IT department from the rest of the forest. Sales and operations are also one domain these two groups naturally fits together, operations being a department that support sales with e.g. customer support. Sales/operations could also have been seperated further but in order to keep cost down they are merged into one. Since the case does not mention a number of clients in each department a further split is not nessesarly needed. Finally production is placed in its own domain as it suspected their needs and types of clients might be different from other departments. It is not mentioned in the case what type of production G2K is doing. 
+		As the Swedish division is so small it doesnt have have an IT department its a perfect a perfect place to install a RODC server. This also lowers WAN network traffic between Denmark and Sweden while resulting in lower latency for authentication. RODC has many benefits in the areas of security, such as Unidirectional replication, Special krbtgt account, Password Replication Policy and RODC filtered attribute set; managebility, such as branch office server administration and Branch office application administration; and scalability, such as DFS Replication versus FRS for SYSVOL replication and DC locator improvements. (src: Microsoft Technet, https://technet.microsoft.com/en-us/library/cc770320%28v=ws.10%29.aspx)
+		[INSERT RODC PICTURE HERE]
+		Naturally with this kind of setup replication configuration is needed - which leads to the next chapter: Sites.
+	
+	Sites
+		Sites are a wonderfull addition to active directory. According to Microsoft "Sites help facilitate several activities", including:
+			Replication - Balancing/optimizing bandwith optimization.
+			Authentication - "Site information helps make authentication faster and more efficient. When a client logs on to a domain, it first requests a domain controller in its 	local site for authentication."
+			Service location - Including ADCS, exchange server, messeage queing and more.
+		(src: Microsoft Technet, https://technet.microsoft.com/en-us/library/cc754697.aspx)
+		Furthermore " Physical Topology represents the structure of the network which includes network topologies, hardware placements, IP address allocations. Logical Topology represents the security boundaries of said network, network services etc. In  an Active Directory infrastructure setup, the Domain represents the logical topology while Sites and Subnets represent the physical topology." (src: Dishan Franchis (MVP), http://blogs.technet.com/b/canitpro/archive/2015/03/04/step-by-step-setting-up-active-directory-sites-subnets-amp-site-links.aspx)
+		By having one site in CPH and one in Gothenburg on each domain it is possible to control replication, authentication (looking up credentials on local RODC) and service location. For instance the production domain will most likely need to use services locally. 
+		[INSERT PRODUCTION DOMAIN PLUGIN]
+		In the above example the Swedish site is using a local RODC to authenticate and access services. The RODC should be configured to also have global catalog with replication from the Danish DC's and - ofcourse - different subnet (src: Aniscademy, http://www.anisacademy.com/configuring-active-directory-sites-and-replication/). The other domains are using similiar setup. As WAN replication can be costly and affect bandwith so it is not optimal to use the lowest update frequency possible, which is 15 minutes. As for site-link cost it is impossible to know the exact number without performing som field test.
+		Instead a once per day frequency should be enough and it can go on outside work hours. Figure xx shows the sitelink replication schedueling interface:
+		[INSERT SITE LINK PICTURE]
+		
+		
+	OU Structure
+		Before designing group strategy, scope and so on organizational unit (OU) structure provides a overview of the elements of the business, in a IT context. Figure xx shows OU structure for the production domain, this is similiar to configuration of the other domains ie. that is Sales & operations and  Exc. management HR (see figure xx).
+		[INSERT PRODUCTION OU HERE]
+		The OU structure presented on figure xx shows a so called "geographical model" where the domain "Production.G2KNordic.com" is divided in to two sites, on different IP subnets. The OU is further divided into accounts which must have atleast two: Regular users and admins. (src: Microsoft Technet: https://technet.microsoft.com/en-gb/magazine/2008.05.oudesign.aspx)
+		In the sake of completeness figure xx shows users in global groups, permissions (in Domain local group):
+		[INSERT GROUP STRUCTURE FIGURE HERE]
+		Figure xx lead us to the next chapter: Group strategy.
+		
+
+	Group Strategy
+		Over the years several best practices have developed such as AGLDP and AGUDLP. AGLDP is "an abbreviation of "account, global, domain local, permission" briefly summarizes Microsoft's recommendations for implementing role-based access controls (RBAC) using nested groups in a native-mode Active Directory (AD) domain". (src: AGDLP, Wikipedia: https://en.wikipedia.org/wiki/AGDLP). AGUDLP is another, extended, strategy which includes Universal groups and is an abbreviation of "account, global, universal, domain local, permissions". Several other group strategies exist such as AGLP and IGDLA (""dentity, Global Group, Domain Local Group, Access"" but the rest of this chapter will focus on AGLDP and AGUDLP.
+			
+		AGLDP group strategy:
+		Account > Global Groups > Domain local > Permissions (read, write full).
+		[INSERT AGDLP Picture here]
+			Role based group strategy
+				Does not require knowledge of permissions
+				User's access easily changed
+				Provides easy audinting
+				Often used for medium sized networks (defined by Microsoft as a network greater than 500 users)
+				Primarly used in one forest one dommain networks.
+		AGUDLP group strategy
+		Account > Global Group > Univesal Groups > Domain local > Permissions (read, write full).
+			Higher complexity
+			Scales better than AGLDP
+			Provides flexibility
+			Effiency in replication
+			By adding universal group exutives (for instance) can access data in all domains as needed.
+			Global groups are added to universal groups, for easy of administration and security.
+			A lower level of admins can add/remove to global group while the universal group remains largely unchanged, unless a domain is added, or if new groups needs to be added later.
+			AGULP helps divide forest wide administration while reducing replication in the same scope.
+			Domain local groups are used by local domain admins to add/remove resource as needed.
+			A domain administrator cannot change local groups in another domain, this provides additional security. This also allow better local control and audition. 
+			
+	
+	
+
+
+
+Conclusion
+
+
+Appendix

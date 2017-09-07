@@ -1,0 +1,60 @@
+Group2know:
+
+Case:
+	US company > Europe
+	EU company with OWN domain & Forest.
+	Start in DK, already has office in DK, then move to other NORDIC countries.
+	DK division is HQ for EU.
+	DK/CPH office has IT staff.
+	New office in SE/Gothenburg.
+	MAYBE make office in Oslo later.
+	MAYBE continue to Germany.
+	No string to US market, german market bigger than nordic.
+	Consider domain for germany, or for nordic and germany seperatly, or one big domain.
+
+CPH HQ departments: 	Excutive office, Mid-level management, Sales, HR, Production, Operation, IT
+GOTHENBURG departments: Mid-level management, Sales, Production, Operation
+
+Assignment:
+	Design forest, domain, site structure.
+	Define OU structure.
+	Define a group strategy (nesting solution) based on the different group scopes. 
+	
+	
+	(forest/domain/site structure, server architecture, AD structure, OU structure and group management strategy and nesting solutions.)
+
+
+Notes:
+Dedicated forest root domain (single forest tree)
+	(Not recommended, s 620)
+SIngle forest tree with only one domain (site structure)
+	(see recommendation, s 620)
+	s 622:
+	"In fact, given the market’s current concerns with security,
+	many consultants are recommending that organizations design either a single-domain forest
+	or use multiple forests."
+Multiple forest tree
+	s 622
+
+Single / multiple domains (s 621)
+	"A single DnS namespace An Active Directory domain has a single DNS domain
+	name. If you need multiple domain names, you need multiple domains. However, give
+	serious consideration to the costs and risks of multiple domains before modeling your
+	directory service domains to match arbitrary DNS name requirements."
+
+Nesting solution across domains evt med unversal groups, nesting solutin across sites evt global groups?
+http://www.programmershare.com/2152735/
+
+One domain with several sites eg. Oslo slag, DK salg etc with ADGLA is option.
+
+Tænk over replication, membership og avail i forbindelse med groups.
+
+Authentication / Antallet af DCs:
+	s 636: "When a user from one domain logs on to a computer in another domain,
+	the authentication request must also traverse the trust path. This can affect performance,
+	and, if a domain controller is not available in a domain along the trust path, the client cannot
+	authenticate or access the service."
+
+
+
+
